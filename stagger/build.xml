@@ -1,0 +1,33 @@
+<project name="stagger" basedir="." default="jar">
+    <property name="src.dir" value="src"/>
+    <property name="classes.dir" value="classes"/>
+    <!-- <property name="build.compiler" value="javac1.7"/> -->
+
+    <target name="clean">
+        <delete dir="${classes.dir}" failonerror="false"/>
+        <delete file="${ant.project.name}.jar"/>
+    </target>
+
+    <target name="flex">
+        <exec executable="jflex" dir="${src.dir}">
+            <arg value="-d"/>
+            <arg value="se/su/ling/stagger"/>
+            <arg value="*.flex"/>
+        </exec>
+    </target>
+
+    <target name="compile" depends="flex">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}"
+               includeantruntime="false"
+               debug="true" debuglevel="lines,vars,source"/>
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar destfile="${ant.project.name}.jar" basedir="${classes.dir}">
+            <manifest>
+                <attribute name="Main-Class" value="se.su.ling.stagger.Main"/>
+            </manifest>
+        </jar>
+    </target>
+</project>
