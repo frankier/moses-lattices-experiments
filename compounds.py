@@ -46,8 +46,9 @@ def run_analyzer(dic):
 	    	extract= re.findall(r'\w+(?=\<\w*\>)', subword) #extract the subwords from each hfst analysis
 	    	if extract:
 	    		subword_lst.append(set(extract))
-	    maxl= 1
+	    
 	    for subwords in subword_lst:
+		maxl= 1
 	    	if len(subwords)> maxl:
 	    		maxl= len(subwords) 
 	    dic[token]['subwords']= subword_lst
