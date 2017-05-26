@@ -149,6 +149,7 @@ public class Main {
         int neBeamSize = 4;
         String lang = null;
         boolean preserve = false;
+        int multiple = -1;
         float embeddingSigma = 0.1f;
         boolean plainOutput = false;
         String fold = null;
@@ -199,6 +200,8 @@ public class Main {
                 neBeamSize = Integer.parseInt(args[++i]);
             } else if(args[i].equals("-preserve")) {
                 preserve = true;
+            } else if(args[i].equals("-multiple")) {
+                multiple = Integer.parseInt(args[++i]);
             } else if(args[i].equals("-plain")) {
                 plainOutput = true;
             } else if(args[i].equals("-fold")) {
@@ -433,7 +436,7 @@ public class Main {
                     System.exit(1);
                 }
                 ArrayList<String> inputFiles = new ArrayList<String>();
-                for(i++; i<args.length && !args[i].startsWith("-"); i++)
+                for(i++; i<args.length && (args[i].equals("-") || !args[i].startsWith("-")); i++)
                     inputFiles.add(args[i]);
                 if(inputFiles.size() < 1) {
                     System.err.println("No files to tag.");
@@ -443,10 +446,11 @@ public class Main {
 
                 ObjectInputStream modelReader = new ObjectInputStream(
                     new FileInputStream(modelFile));
-                System.err.println( "Loading Stagger model ...");
+                System.err.println("Loading Stagger model ...");
                 Tagger tagger = (Tagger)modelReader.readObject();
                 lang = tagger.getTaggedData().getLanguage();
                 modelReader.close();
+                System.err.println("Loaded.");
 
                 // TODO: experimental feature, might remove later
                 tagger.setExtendLexicon(extendLexicon);
@@ -454,7 +458,8 @@ public class Main {
 
                 for(String inputFile : inputFiles) {
                     if(!(inputFile.endsWith(".txt") ||
-                         inputFile.endsWith(".txt.gz")))
+                         inputFile.endsWith(".txt.gz") ||
+                         inputFile.endsWith("-")))
                     {
                         inputSents = tagger.getTaggedData().readConll(
                             inputFile, null, true,
@@ -524,12 +529,25 @@ public class Main {
                                      tok.offset;
                                 sent[j] = new TaggedToken(tok, id);
                             }
-                            TaggedToken[] taggedSent =
-                                tagger.tagSentence(sent, true, false);
-                            tagger.getTaggedData().writeConllSentence(
-                                (writer == null)? System.out : writer,
-                                taggedSent, plainOutput);
+                            Appendable w = (writer == null)? System.out : writer;
+                            if (multiple != -1) {
+                                Tagger.SentenceScore[] taggedSents =
+                                    tagger.tagSentenceMany(sent, true, multiple);
+                                for (i=0;i<taggedSents.length;i++) {
+                                    tagger.getTaggedData().writeConllSentence(
+                                        w, taggedSents[i].sentence, plainOutput);
+                                    w.append(Double.toString(taggedSents[i].score));
+                                    w.append("\n\n");
+                                }
+                                w.append("\n");
+                            } else {
+                                TaggedToken[] taggedSent =
+                                    tagger.tagSentence(sent, true, false);
+                                tagger.getTaggedData().writeConllSentence(
+                                    w, taggedSent, plainOutput);
+                            }
                             sentIdx++;
+                            if(writer != null) writer.flush();
                         }
                         tokenizer.yyclose();
                         if(writer != null) writer.close();

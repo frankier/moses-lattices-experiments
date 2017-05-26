@@ -382,7 +382,58 @@ public class Tagger implements Serializable {
         return taggedSentence;
     }
 
+    public SentenceScore[] tagSentenceMany(
+                    TaggedToken[] sentence, boolean average, int times) {
+        if(!hasPos || hasNE) assert(false);
+        SentenceScore[] taggedSentences = tagPosMany(sentence, average, times);
+        for(int s=0; s<taggedSentences.length; s++) {
+            TaggedToken[] taggedSentence = taggedSentences[s].sentence;
+            for(int i=0; i<sentence.length; i++) {
+                if (taggedSentence[i].lf == null) {
+                    taggedSentence[i].lf = getLemma(taggedSentence[i]);
+                }
+            }
+        }
+        return taggedSentences;
+    }
+
+    protected void copyPosFromHistory(TaggedToken[] sentence, History history) {
+        for(int i=0; i<sentence.length; i++) {
+            sentence[sentence.length-(i+1)].posTag = history.posTag;
+            history = history.last;
+        }
+        assert(history == null);
+    }
+
+    static public TaggedToken[] copy_sentence(TaggedToken[] sent) {
+        TaggedToken[] sent2 = new TaggedToken[sent.length];
+        for (int i=0;i<sent.length;i++) {
+            sent2[i] = new TaggedToken(sent[i]);
+        }
+        return sent2;
+    }
+
+    protected SentenceScore[] tagPosMany(TaggedToken[] sentence,
+                                         boolean average, int times) {
+        assert(times <= posBeamSize);
+        History[] beam = tagPosBeam(sentence, average);
+        int actual_times = Math.min(beam.length, times);
+        SentenceScore[] result = new SentenceScore[actual_times];
+        for(int i=0;i<actual_times;i++) {
+            result[i] = new SentenceScore();
+            result[i].sentence = copy_sentence(sentence);
+            copyPosFromHistory(result[i].sentence, beam[i]);
+            result[i].score = beam[i].score;
+        }
+        return result;
+    }
+
     protected void tagPos(TaggedToken[] sentence, boolean average) {
+        History[] beam = tagPosBeam(sentence, average);
+        copyPosFromHistory(sentence, beam[0]);
+    }
+
+    protected History[] tagPosBeam(TaggedToken[] sentence, boolean average) {
         History[] beam = new History[posBeamSize];
         History[] nextBeam = new History[posBeamSize];
         int[] feats = new int[maxFeats];
@@ -481,12 +532,7 @@ public class Tagger implements Serializable {
         }
         */
         // Copy the annotation of the best history to the sentence.
-        History history = beam[0];
-        for(int i=0; i<sentence.length; i++) {
-            sentence[sentence.length-(i+1)].posTag = history.posTag;
-            history = history.last;
-        }
-        assert(history == null);
+        return beam;
     }
 
     // May be implemented by a subclass
@@ -1240,6 +1286,16 @@ public class Tagger implements Serializable {
             this.neTypeTag = neTypeTag;
             this.score = score;
             this.last = last;
+        }
+    }
+
+    public static class SentenceScore {
+        public TaggedToken[] sentence;
+        public double score;
+        public SentenceScore() {}
+        public SentenceScore(TaggedToken[] sentence, double score) {
+            this.sentence = sentence;
+            this.score = score;
         }
     }
 }
