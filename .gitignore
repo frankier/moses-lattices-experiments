@@ -124,3 +124,6 @@ ENV/
 /site
 
 # End of https://www.gitignore.io/api/java,python
+
+*Tokenizer.java
+*Tokenizer.java~
