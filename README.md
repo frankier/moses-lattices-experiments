@@ -6,5 +6,5 @@ To run tagging.py you need the following requirements (Debian/Ubuntu/Linux Mint 
 
 You will also need the stagger data file:
 
- $ wget http://mumin.ling.su.se/projects/stagger/swedish.bin.bz2
- $ bunzip swedish.bin.bz2
+    $ wget http://mumin.ling.su.se/projects/stagger/swedish.bin.bz2
+    $ bunzip swedish.bin.bz2
