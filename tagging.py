@@ -9,7 +9,7 @@ def make_lattice(stagger_analysis):
     pass  # TODO
 
 child = pexpect.spawn(
-    "java -jar stagger/stagger.jar -modelfile swedish.bin "
+    "java -Xxmx4g -jar stagger/stagger.jar -modelfile swedish.bin "
     "-posBeamSize 200 -multiple 10 -tag -")
 child.expect('Loaded')
 
