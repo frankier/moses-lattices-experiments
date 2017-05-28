@@ -55,31 +55,16 @@ def make_lattice(stagger_analysis):
             score = str(analyses[i][edge])
             lattice_edge = "(" + edge + "," + score + ",1)"
             lattice += lattice_edge + ","
-            print(lattice)
         lattice = lattice[:len(lattice)-1] + "),"
-        print(lattice)
     lattice = lattice[:len(lattice)-1] + ")"
     print(lattice)
-
-    return  lattice # TODO
-        
-
-def make_lattice(stagger_analysis):
-    words = []
-    stagger_analysis = stagger_analysis.decode("utf-8")
-    stagger_analysis = stagger_analysis.splitlines()
-    in_analysis = True
-    for line in stagger_analysis:
-        line = line.split(' ')
-        if line.startswith(
-        print(line)
-    return  stagger_analysis # TODO
+    return lattice # TODO
 
 child = pexpect.spawn(
-    "java -jar stagger/stagger.jar -modelfile swedish.bin "
+    "java -Xmx4g -jar stagger/stagger.jar -modelfile swedish.bin "
     "-posBeamSize 200 -multiple 10 -tag -")
 child.expect('Loaded')
-'''
+
 print('(')
 
 # Input is in horizontal tokenized format, but stagger takes verical
@@ -92,4 +77,3 @@ for line in sys.stdin:
     print(make_lattice(child.before))
 
 print(')')
-'''
