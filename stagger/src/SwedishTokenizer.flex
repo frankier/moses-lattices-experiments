@@ -63,6 +63,21 @@ public ArrayList<Token> readSentence() throws IOException {
     if(sentence.isEmpty()) return null;
     return sentence;
 }
+
+public ArrayList<Token> readSentenceTokenized() throws IOException {
+    ArrayList<Token> sentence = new ArrayList<Token>();
+    Token token;
+
+    while((token = yylex()) != null) {
+        if(token.type == Token.TOK_NEWLINES) {
+            return sentence;
+        } else {
+            sentence.add(token);
+        }
+    }
+    if(sentence.isEmpty()) return null;
+    return sentence;
+}
 %}
 
 %%

@@ -509,11 +509,12 @@ public class Main {
                             writer = new BufferedWriter(
                                 new OutputStreamWriter(System.out, "UTF-8"));
                         }
-                        Tokenizer tokenizer = getTokenizer(reader, lang);
+                        SwedishTokenizer tokenizer =
+                            new SwedishTokenizer(reader);
                         ArrayList<Token> sentence;
                         int sentIdx = 0;
                         long base = 0;
-                        while((sentence=tokenizer.readSentence())!=null) {
+                        while((sentence=tokenizer.readSentenceTokenized())!=null) {
                             TaggedToken[] sent =
                                 new TaggedToken[sentence.size()];
                             if(tokenizer.sentID != null) {
