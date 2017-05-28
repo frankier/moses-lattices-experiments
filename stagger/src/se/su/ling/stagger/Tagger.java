@@ -433,6 +433,12 @@ public class Tagger implements Serializable {
         copyPosFromHistory(sentence, beam[0]);
     }
 
+    static History[] trimTo(History[] arr, int cutoff) {
+        History[] trimmed = new History[cutoff];
+        System.arraycopy(arr, 0, trimmed, 0, cutoff);
+        return trimmed;
+    }
+
     protected History[] tagPosBeam(TaggedToken[] sentence, boolean average) {
         History[] beam = new History[posBeamSize];
         History[] nextBeam = new History[posBeamSize];
@@ -532,7 +538,7 @@ public class Tagger implements Serializable {
         }
         */
         // Copy the annotation of the best history to the sentence.
-        return beam;
+        return trimTo(beam, beamUsed);
     }
 
     // May be implemented by a subclass
