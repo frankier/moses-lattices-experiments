@@ -14,6 +14,12 @@ def line_to_factors(line_bits, include_minor=True):
     return '|'.join(factors)
 
 
+def strify(s):
+    s = s.replace("\\", "\\\\")
+    s = s.replace("'", "\\'")
+    return "'" + s + "'"
+
+
 def proc_stagger_out(stagger_out):
     stagger_out = stagger_out.decode("utf-8")
     stagger_out = stagger_out.splitlines()
@@ -62,7 +68,7 @@ def lattice_sent(stagger_analysis, include_minor=True):
         total = sum(analyses[i].values())
         for edge in analyses[i]:
             score = str(analyses[i][edge] / total)
-            lattice_edge = "(" + repr(edge) + "," + score + ",1)"
+            lattice_edge = "(" + strify(edge) + "," + score + ",1)"
             lattice += lattice_edge + ","
         lattice = lattice[:len(lattice)-1] + "),"
     lattice += ")"
