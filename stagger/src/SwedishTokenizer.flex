@@ -69,8 +69,10 @@ public ArrayList<Token> readSentenceTokenized() throws IOException {
     Token token;
 
     while((token = yylex()) != null) {
-        if(token.type == Token.TOK_NEWLINES) {
-            return sentence;
+        if(token.isSpace()) {
+            if(token.type == Token.TOK_NEWLINES) {
+                return sentence;
+            }
         } else {
             sentence.add(token);
         }
