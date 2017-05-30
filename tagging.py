@@ -70,7 +70,7 @@ def lattice_sent(stagger_analysis, include_minor=True):
             score = str(analyses[i][edge] / total)
             lattice_edge = "(" + strify(edge) + "," + score + ",1)"
             lattice += lattice_edge + ","
-        lattice = lattice[:len(lattice)-1] + "),"
+        lattice = lattice + "),"
     lattice += ")"
     return lattice
 
